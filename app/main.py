@@ -1,5 +1,6 @@
 import os
 import httpx
+from urllib.parse import quote
 from fastapi import FastAPI, HTTPException, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
@@ -44,12 +45,12 @@ async def request_media(body: RequestBody, _: str = Depends(verify_token)):
         raise HTTPException(status_code=400, detail="media_type must be 'movie' or 'tv'")
 
     headers = _overseerr_headers()
+    encoded_query = quote(body.query, safe="")
 
     async with httpx.AsyncClient(timeout=15) as client:
         # 1 — Search Overseerr
         search = await client.get(
-            f"{OVERSEERR_URL}/api/v1/search",
-            params={"query": body.query, "page": 1},
+            f"{OVERSEERR_URL}/api/v1/search?query={encoded_query}&page=1",
             headers=headers,
         )
         if search.status_code != 200:
