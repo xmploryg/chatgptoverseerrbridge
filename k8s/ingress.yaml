@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatgpt-bridge
+  namespace: chatgpt-bridge
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - chatgpt-bridge.local.phoenixlab.me
+    secretName: chatgpt-bridge-tls
+  rules:
+  - host: chatgpt-bridge.local.phoenixlab.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: chatgpt-bridge
+            port:
+              number: 8000

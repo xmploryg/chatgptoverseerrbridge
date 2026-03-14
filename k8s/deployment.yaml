@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatgpt-bridge
+  namespace: chatgpt-bridge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatgpt-bridge
+  template:
+    metadata:
+      labels:
+        app: chatgpt-bridge
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+      containers:
+      - name: chatgpt-bridge
+        # Built and pushed automatically by .github/workflows/docker-publish.yml
+        # Use either registry — both are updated on every push to main:
+        #   ghcr.io/YOUR_GH_USER/chatgpt-overseerr-bridge:latest
+        #   YOUR_DOCKERHUB_USER/chatgpt-overseerr-bridge:latest
+        image: ghcr.io/YOUR_GH_USER/chatgpt-overseerr-bridge:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: bridge-config
+        - secretRef:
+            name: bridge-secrets
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi

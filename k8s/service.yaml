@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatgpt-bridge
+  namespace: chatgpt-bridge
+  labels:
+    app: chatgpt-bridge
+spec:
+  type: ClusterIP
+  selector:
+    app: chatgpt-bridge
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000

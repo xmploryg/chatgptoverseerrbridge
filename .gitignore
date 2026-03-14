@@ -1,0 +1,8 @@
+# Never commit real secrets
+k8s/secret.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/

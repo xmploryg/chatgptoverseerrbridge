@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bridge-config
+  namespace: chatgpt-bridge
+data:
+  # In-cluster Overseerr address — no external DNS needed.
+  OVERSEERR_URL: "http://overseerr.overseerr.svc.cluster.local:5055"
